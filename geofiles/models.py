@@ -29,6 +29,7 @@ class GeoFile(models.Model):
     crs = models.CharField(max_length=64, blank=True)
     feature_count = models.PositiveIntegerField(null=True, blank=True)
     error_message = models.TextField(blank=True)
+    warnings = models.JSONField(default=list, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)
@@ -65,7 +66,9 @@ class Feature(models.Model):
     area_m2 = models.FloatField(null=True, blank=True)
     length_m = models.FloatField(null=True, blank=True)
     perimeter_m = models.FloatField(null=True, blank=True)
-    projected_crs = models.CharField(max_length=64, blank=True)
+    geodesic_area_m2 = models.FloatField(null=True, blank=True)
+    geodesic_length_m = models.FloatField(null=True, blank=True)
+    projected_crs = models.CharField(max_length=128, blank=True)
     notes = models.TextField(blank=True)
 
     class Meta:

@@ -44,6 +44,7 @@ class GeoFileSerializer(serializers.ModelSerializer):
             "crs",
             "feature_count",
             "error_message",
+            "warnings",
             "created_at",
             "started_at",
             "completed_at",

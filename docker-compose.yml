@@ -27,5 +27,15 @@ services:
       db:
         condition: service_healthy
 
+  worker:
+    build: .
+    command: python manage.py process_files
+    env_file: .env
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
