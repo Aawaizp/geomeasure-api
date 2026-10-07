@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404
+from django.views.generic import TemplateView
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +14,11 @@ from geofiles.serializers import (
     GeoFileUploadSerializer,
 )
 
+
+class ViewerPage(TemplateView):
+    """A small map page for uploading files and inspecting measurements."""
+
+    template_name = "geofiles/viewer.html"
 
 class GeoFileListCreateView(generics.ListAPIView):
     """GET lists uploaded files; POST uploads a new one.

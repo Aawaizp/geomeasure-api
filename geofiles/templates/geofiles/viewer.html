@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>GeoMeasure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    :root {
+      --ink: #17212a;
+      --ink-soft: #55626d;
+      --paper: #f3f5f4;
+      --panel: #ffffff;
+      --line: #d9dfe3;
+      --hivis: #f26b1d;
+      --teal: #0f6e74;
+      --danger: #b42318;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: "Barlow", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      display: grid;
+      grid-template-columns: minmax(320px, 400px) 1fr;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .num {
+      font-variant-numeric: tabular-nums;
+    }
+
+    aside {
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    header {
+      padding: 20px 22px 14px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      color: var(--ink-soft);
+    }
+
+    .drop {
+      margin: 6px 22px 16px;
+      border: 2px dashed var(--line);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+
+    .drop:hover,
+    .drop:focus-visible,
+    .drop.over {
+      border-color: var(--hivis);
+      background: #fff7f2;
+      outline: none;
+    }
+
+    .drop strong {
+      display: block;
+      font-size: 16px;
+    }
+
+    .drop span {
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .drop input {
+      display: none;
+    }
+
+    .status {
+      margin: 0 22px 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--paper);
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.error {
+      background: #fdecea;
+      color: var(--danger);
+    }
+
+    .status .file {
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .totals {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      margin: 0 22px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .totals.show {
+      display: grid;
+    }
+
+    .totals div {
+      padding: 10px 12px;
+    }
+
+    .totals div+div {
+      border-left: 1px solid var(--line);
+    }
+
+    .totals b {
+      display: block;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .totals small {
+      color: var(--ink-soft);
+    }
+
+    .list {
+      overflow-y: auto;
+      flex: 1;
+      border-top: 1px solid var(--line);
+    }
+
+    .list h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin: 14px 22px 6px;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 12px 1fr auto;
+      gap: 10px;
+      align-items: baseline;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      border-left: 3px solid transparent;
+      background: none;
+      font: inherit;
+      color: inherit;
+      padding: 9px 22px 9px 19px;
+      cursor: pointer;
+    }
+
+    .feature:hover {
+      background: var(--paper);
+    }
+
+    .feature:focus-visible {
+      outline: 2px solid var(--hivis);
+      outline-offset: -2px;
+    }
+
+    .feature.active {
+      border-left-color: var(--hivis);
+      background: #fff7f2;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      align-self: center;
+    }
+
+    .feature .name {
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .feature .type {
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .feature .value {
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .feature .value.muted {
+      font-weight: 400;
+      color: var(--ink-soft);
+    }
+
+    .empty {
+      color: var(--ink-soft);
+      margin: 4px 22px 18px;
+    }
+
+    .recent button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: none;
+      font: inherit;
+      color: inherit;
+      padding: 7px 22px;
+      cursor: pointer;
+    }
+
+    .recent button:hover {
+      background: var(--paper);
+    }
+
+    .recent small {
+      color: var(--ink-soft);
+    }
+
+    #map {
+      height: 100%;
+      min-height: 0;
+    }
+
+    .leaflet-popup-content {
+      font-family: "Barlow", system-ui, sans-serif;
+      font-size: 14px;
+      margin: 12px 14px;
+    }
+
+    .readout {
+      min-width: 210px;
+    }
+
+    .readout h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .readout dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2px 12px;
+      margin: 0;
+    }
+
+    .readout dt {
+      color: var(--ink-soft);
+    }
+
+    .readout dd {
+      margin: 0;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .readout .check {
+      margin-top: 8px;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .readout .note {
+      margin-top: 6px;
+      color: var(--danger);
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 55vh auto;
+      }
+
+      #map {
+        grid-row: 1;
+      }
+
+      aside {
+        grid-row: 2;
+        border-right: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .list {
+        overflow: visible;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <aside>
+    <header>
+      <h1>GeoMeasure</h1>
+      <p>Upload a KML or zipped Shapefile to measure every area and line in it.</p>
+    </header>
+
+    <label class="drop" id="drop" tabindex="0">
+      <input type="file" id="file" accept=".kml,.zip">
+      <strong>Choose a file or drop it here</strong>
+      <span>.kml or .zip (Shapefile), up to 50 MB</span>
+    </label>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+
+    <div class="totals" id="totals">
+      <div><b class="num" id="total-area">–</b><small>Total area</small></div>
+      <div><b class="num" id="total-length">–</b><small>Total length</small></div>
+    </div>
+
+    <div class="list" id="list">
+      <h2>Recent files</h2>
+      <div class="recent" id="recent">
+        <p class="empty">Nothing uploaded yet.</p>
+      </div>
+    </div>
+  </aside>
+
+  <div id="map" aria-label="Map of uploaded features"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script>
+    (() => {
+      const COLORS = { area: "#f26b1d", line: "#0f6e74", point: "#17212a", other: "#8a96a0" };
+
+      // ---- Map -------------------------------------------------------------
+      const street = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19, attribution: "Tiles &copy; Esri" },
+      );
+      const satellite = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19, attribution: "Imagery &copy; Esri" },
+      );
+      const map = L.map("map", { layers: [street] }).setView([12.9716, 77.5946], 11);
+      L.control.layers({ Street: street, Satellite: satellite }).addTo(map);
+      L.control.scale({ imperial: false }).addTo(map);
+      let featureLayer = null;
+      const layersByIndex = new Map();
+
+      // ---- Helpers ---------------------------------------------------------
+      const $ = (id) => document.getElementById(id);
+      const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+      const fmt = (n, digits = 1) => Number(n).toLocaleString("en-IN", {
+        minimumFractionDigits: digits, maximumFractionDigits: digits,
+      });
+      const formatArea = (m2) => (m2 >= 10000 ? `${fmt(m2 / 10000, 2)} ha` : `${fmt(m2)} m²`);
+      const formatLength = (m) => (m >= 1000 ? `${fmt(m / 1000, 3)} km` : `${fmt(m)} m`);
+      const kind = (f) => (f.measurements?.area_m2 != null ? "area"
+        : f.measurements?.length_m != null ? "line"
+          : f.geometry_type.includes("Point") ? "point" : "other");
+      const featureName = (f) => f.properties?.Name || f.properties?.name || `Feature ${f.index + 1}`;
+
+      function showStatus(html, isError = false) {
+        const box = $("status");
+        box.innerHTML = html;
+        box.className = `status show${isError ? " error" : ""}`;
+      }
+
+      async function api(url, options) {
+        const response = await fetch(url, options);
+        const body = await response.json().catch(() => ({}));
+        return { response, body };
+      }
+
+      // ---- Upload and polling ---------------------------------------------
+      async function upload(file) {
+        showStatus(`<span class="file">${esc(file.name)}</span><br>Uploading…`);
+        const form = new FormData();
+        form.append("file", file);
+        const { response, body } = await api("/api/files/", { method: "POST", body: form });
+        if (!response.ok) {
+          const message = body.file?.join(" ") || body.detail || "The upload was rejected.";
+          showStatus(`<span class="file">${esc(file.name)}</span><br>${esc(message)}`, true);
+          return;
+        }
+        openFile(body.id);
+      }
+
+      async function openFile(id) {
+        history.replaceState(null, "", `?file=${id}`);
+        for (let attempt = 0; attempt < 120; attempt++) {
+          const { response, body } = await api(`/api/files/${id}/`);
+          if (!response.ok) { showStatus("That file no longer exists.", true); return; }
+          const name = `<span class="file">${esc(body.filename)}</span>`;
+          if (body.status === "COMPLETED") return showMeasurements(id, body);
+          if (body.status === "FAILED") {
+            showStatus(`${name}<br>Could not be processed: ${esc(body.error_message)}`, true);
+            return;
+          }
+          showStatus(`${name}<br>${body.status === "QUEUED" ? "Waiting in queue…" : "Measuring features…"}`);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        showStatus("Processing is taking longer than expected. Refresh to check again.", true);
+      }
+
+      // ---- Results -----------------------------------------------------------
+      async function showMeasurements(id, info) {
+        const { body } = await api(`/api/files/${id}/measurements/`);
+        const warnings = (body.warnings || []).map((w) => `<br>⚠ ${esc(w)}`).join("");
+        showStatus(
+          `<span class="file">${esc(info.filename)}</span><br>` +
+          `${body.summary.feature_count} features, source CRS ${esc(body.source_crs)}${warnings}`,
+        );
+
+        $("total-area").textContent = body.summary.total_area_m2 ? formatArea(body.summary.total_area_m2) : "–";
+        $("total-length").textContent = body.summary.total_length_m ? formatLength(body.summary.total_length_m) : "–";
+        $("totals").classList.add("show");
+
+        drawFeatures(body.features);
+        renderList(body.features);
+        loadRecent();
+      }
+
+      function drawFeatures(features) {
+        if (featureLayer) featureLayer.remove();
+        layersByIndex.clear();
+        const collection = {
+          type: "FeatureCollection",
+          features: features.filter((f) => f.geometry).map((f) => ({ type: "Feature", geometry: f.geometry, properties: f })),
+        };
+        featureLayer = L.geoJSON(collection, {
+          style: (feature) => {
+            const color = COLORS[kind(feature.properties)];
+            return { color, weight: 3, fillColor: color, fillOpacity: 0.18 };
+          },
+          pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+            radius: 6, color: "#fff", weight: 2, fillColor: COLORS.point, fillOpacity: 1,
+          }),
+          onEachFeature: (feature, layer) => {
+            layer.bindPopup(readout(feature.properties));
+            layer.on("click", () => highlight(feature.properties.index, false));
+            layersByIndex.set(feature.properties.index, layer);
+          },
+        }).addTo(map);
+        if (featureLayer.getLayers().length) map.fitBounds(featureLayer.getBounds(), { padding: [30, 30] });
+      }
+
+      function readout(f) {
+        const m = f.measurements;
+        let rows = "";
+        if (m?.area_m2 != null) {
+          rows = `<dt>Area</dt><dd class="num">${fmt(m.area_m2)} m²</dd>
+                <dt>Hectares</dt><dd class="num">${fmt(m.area_hectares, 4)}</dd>
+                <dt>Acres</dt><dd class="num">${fmt(m.area_acres, 4)}</dd>
+                <dt>Perimeter</dt><dd class="num">${formatLength(m.perimeter_m)}</dd>`;
+        } else if (m?.length_m != null) {
+          rows = `<dt>Length</dt><dd class="num">${formatLength(m.length_m)}</dd>`;
+        } else {
+          rows = `<dt>Measurement</dt><dd>${f.measurement_status === "NOT_APPLICABLE" ? "Not needed for points" : esc(f.measurement_status)}</dd>`;
+        }
+        const check = m?.cross_check
+          ? `<div class="check num">Geodesic check: ${fmt(m.cross_check.geodesic_value)} (${fmt(m.cross_check.difference_percent, 4)}% apart)</div>`
+          : "";
+        const note = f.notes ? `<div class="note">${esc(f.notes)}</div>` : "";
+        return `<div class="readout"><h3>${esc(featureName(f))}</h3><dl>${rows}</dl>${check}${note}</div>`;
+      }
+
+      function renderList(features) {
+        const list = $("list");
+        list.innerHTML = `<h2>Features</h2>`;
+        for (const f of features) {
+          const k = kind(f);
+          const value = k === "area" ? formatArea(f.measurements.area_m2)
+            : k === "line" ? formatLength(f.measurements.length_m)
+              : k === "point" ? "Point" : f.measurement_status.toLowerCase();
+          const button = document.createElement("button");
+          button.className = "feature";
+          button.dataset.index = f.index;
+          button.innerHTML = `
+          <span class="swatch" style="background:${COLORS[k]}"></span>
+          <span><span class="name">${esc(featureName(f))}</span><br><span class="type">${esc(f.geometry_type)}${f.layer ? ` in ${esc(f.layer)}` : ""}</span></span>
+          <span class="value num${k === "area" || k === "line" ? "" : " muted"}">${esc(value)}</span>`;
+          button.addEventListener("click", () => highlight(f.index, true));
+          list.appendChild(button);
+        }
+        const recent = document.createElement("div");
+        recent.innerHTML = `<h2>Recent files</h2><div class="recent" id="recent"></div>`;
+        list.appendChild(recent);
+      }
+
+      function highlight(index, zoom) {
+        document.querySelectorAll(".feature").forEach((el) => el.classList.toggle("active", Number(el.dataset.index) === index));
+        const layer = layersByIndex.get(index);
+        if (!layer) return;
+        if (zoom) {
+          if (layer.getBounds) map.fitBounds(layer.getBounds(), { padding: [60, 60], maxZoom: 18 });
+          else map.setView(layer.getLatLng(), 17);
+          layer.openPopup();
+        }
+        document.querySelector(`.feature[data-index="${index}"]`)?.scrollIntoView({ block: "nearest" });
+      }
+
+      async function loadRecent() {
+        const { body } = await api("/api/files/");
+        const target = $("recent");
+        if (!target) return;
+        const files = (body.results || body || []).slice(0, 8);
+        if (!files.length) { target.innerHTML = `<p class="empty">Nothing uploaded yet.</p>`; return; }
+        target.innerHTML = "";
+        for (const file of files) {
+          const button = document.createElement("button");
+          button.innerHTML = `${esc(file.filename)}<br><small>${esc(file.status.charAt(0) + file.status.slice(1).toLowerCase())}, ${new Date(file.created_at).toLocaleString()}</small>`;
+          button.addEventListener("click", () => openFile(file.id));
+          target.appendChild(button);
+        }
+      }
+
+      // ---- Wiring ------------------------------------------------------------
+      const drop = $("drop");
+      $("file").addEventListener("change", (e) => e.target.files[0] && upload(e.target.files[0]));
+      drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("file").click(); } });
+      ["dragenter", "dragover"].forEach((type) => drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+      ["dragleave", "drop"].forEach((type) => drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+      drop.addEventListener("drop", (e) => e.dataTransfer.files[0] && upload(e.dataTransfer.files[0]));
+
+      const startId = new URLSearchParams(location.search).get("file");
+      if (startId) openFile(startId); else loadRecent();
+    })();
+  </script>
+</body>
+
+</html>

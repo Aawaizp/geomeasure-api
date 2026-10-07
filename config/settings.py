@@ -97,11 +97,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MAX_UPLOAD_SIZE_BYTES = int(os.environ.get("MAX_UPLOAD_SIZE_MB", "50")) * 1024 * 1024
 
 REST_FRAMEWORK = {
+    # The API is public for this assignment (see README, "Future scope").
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "UNAUTHENTICATED_USER": None,
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
-    "DEFAULT_PARSER_CLASSES": [
-        "rest_framework.parsers.MultiPartParser",
-        "rest_framework.parsers.JSONParser",
-    ],
 } 
 
 LOGGING = {
