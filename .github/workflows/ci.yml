@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: geomeasure
+          POSTGRES_USER: geo
+          POSTGRES_PASSWORD: geo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U geo -d geomeasure"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_DB: geomeasure
+      POSTGRES_USER: geo
+      POSTGRES_PASSWORD: geo
+      DJANGO_SECRET_KEY: ci-only-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install GDAL (needed by GeoDjango)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gdal-bin
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check for missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run tests
+        run: python manage.py test  
