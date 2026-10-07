@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Demo iron-ore mine (fictional), Ballari district</name>
+    <Folder><name>Lease and pit</name>
+      <Placemark><name>Mining lease boundary</name><ExtendedData><Data name="lease_id"><value>ML-DEMO-0427</value></Data><Data name="mineral"><value>Iron ore</value></Data></ExtendedData>
+        <Polygon><outerBoundaryIs><LinearRing><coordinates>76.4616254,15.1641255 76.4779093,15.1636736 76.4788401,15.1713554 76.4765139,15.1765069 76.4672083,15.1772300 76.4611598,15.1727111 76.4616254,15.1641255</coordinates></LinearRing></outerBoundaryIs></Polygon>
+      </Placemark>
+      <Placemark><name>Main pit</name><ExtendedData><Data name="bench_count"><value>6</value></Data><Data name="note"><value>Unmined island in pit floor is a hole</value></Data></ExtendedData>
+        <Polygon><outerBoundaryIs><LinearRing><coordinates>76.4667432,15.1677406 76.4723263,15.1672887 76.4739083,15.1704518 76.4727916,15.1729823 76.4686042,15.1734342 76.4660917,15.1710845 76.4667432,15.1677406</coordinates></LinearRing></outerBoundaryIs><innerBoundaryIs><LinearRing><coordinates>76.4694417,15.1698192 76.4705583,15.1697289 76.4707444,15.1706326 76.4696278,15.1708134 76.4694417,15.1698192</coordinates></LinearRing></innerBoundaryIs></Polygon>
+      </Placemark>
+    </Folder>
+    <Folder><name>Stockpiles and dumps</name>
+      <Placemark><name>ROM stockpile A</name><ExtendedData><Data name="material"><value>Run-of-mine ore</value></Data></ExtendedData>
+        <Polygon><outerBoundaryIs><LinearRing><coordinates>76.4748387,15.1662042 76.4759553,15.1661138 76.4761414,15.1670175 76.4750248,15.1671983 76.4748387,15.1662042</coordinates></LinearRing></outerBoundaryIs></Polygon>
+      </Placemark>
+      <Placemark><name>Fines stockpile B</name><ExtendedData><Data name="material"><value>Iron ore fines</value></Data></ExtendedData>
+        <Polygon><outerBoundaryIs><LinearRing><coordinates>76.4752109,15.1677406 76.4765137,15.1676502 76.4766068,15.1684635 76.4753971,15.1685539 76.4752109,15.1677406</coordinates></LinearRing></outerBoundaryIs></Polygon>
+      </Placemark>
+      <Placemark><name>Waste dump</name><ExtendedData><Data name="material"><value>Overburden</value></Data></ExtendedData>
+        <Polygon><outerBoundaryIs><LinearRing><coordinates>76.4623698,15.1649389 76.4651613,15.1645775 76.4655335,15.1665657 76.4640447,15.1672887 76.4622767,15.1667464 76.4623698,15.1649389</coordinates></LinearRing></outerBoundaryIs></Polygon>
+      </Placemark>
+    </Folder>
+    <Folder><name>Haul roads</name>
+      <Placemark><name>Haul road: pit to crusher</name><ExtendedData><Data name="width_m"><value>25</value></Data><Data name="surface"><value>Gravel</value></Data></ExtendedData>
+        <LineString><coordinates>76.4727916,15.1674695 76.4739082,15.1665657 76.4752109,15.1657523 76.4766997,15.1653004 76.4776302,15.1645774</coordinates></LineString>
+      </Placemark>
+      <Placemark><name>Haul road: pit to waste dump</name><ExtendedData><Data name="width_m"><value>22</value></Data><Data name="surface"><value>Gravel</value></Data></ExtendedData>
+        <LineString><coordinates>76.4669293,15.1679214 76.4660918,15.1670176 76.4651613,15.1662042 76.4644169,15.1659331</coordinates></LineString>
+      </Placemark>
+    </Folder>
+    <Folder><name>Survey control points</name>
+      <Placemark><name>GCP-01</name><ExtendedData><Data name="accuracy_cm"><value>2</value></Data></ExtendedData>
+        <Point><coordinates>76.4634861,15.1754224,612.4</coordinates></Point>
+      </Placemark>
+      <Placemark><name>GCP-02</name><ExtendedData><Data name="accuracy_cm"><value>2</value></Data></ExtendedData>
+        <Point><coordinates>76.4772580,15.1643966,598.9</coordinates></Point>
+      </Placemark>
+      <Placemark><name>Crusher</name>
+        <Point><coordinates>76.4777232,15.1644870,601.0</coordinates></Point>
+      </Placemark>
+    </Folder>
+  </Document>
+</kml>
